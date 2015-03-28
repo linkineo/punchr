@@ -4,6 +4,9 @@ project(punchr)
 #YCM support
 set(CMAKE_EXPORT_COMPILE_COMMANDS "ON")
 
+#cpp 11
+set(CMAKE_CXX_FLAGS "-std=c++0x")
+
 #boost
 find_package(Boost COMPONENTS program_options REQUIRED)
 
