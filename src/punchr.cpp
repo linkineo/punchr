@@ -44,6 +44,8 @@ int main(int argc, char** argv)
 {
    handleOptions(argc,argv);
    std::cout << "Test" << std::endl;
+   punchr::timeSheet ts;
+   ts.punchIn();
 }
 
 

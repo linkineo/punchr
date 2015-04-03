@@ -8,8 +8,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS "ON")
 set(CMAKE_CXX_FLAGS "-std=c++0x")
 
 #boost
-find_package(Boost COMPONENTS program_options REQUIRED)
+find_package(Boost COMPONENTS program_options date_time  REQUIRED)
 
 include_directories(include src ${Boost_INCLUDE_DIRS})
-add_executable(punchr src/punchr.cpp)
+add_executable(punchr src/punchr.cpp src/timesheet.cpp)
 target_link_libraries(punchr ${Boost_LIBRARIES})
