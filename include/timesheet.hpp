@@ -1,8 +1,7 @@
 #include <string>
-#include "timeSheetElements.hpp"
 
-#include "boost/date_time/gregorian/gregorian.hpp"
-#include "boost/date_time/posix_time/posix_time.hpp"
+#include "timeSheetPersistency.hpp"
+
 
 namespace punchr{
 
@@ -15,6 +14,9 @@ namespace punchr{
 		     timeSheetStates punchOut();
             
 		private:
+		     yearReport timeReport;
+		     boost::posix_time::ptime sessionBegin;
+		     timeSheetPersistency timeSheetPersister;
 	};
 
 	

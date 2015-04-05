@@ -11,5 +11,5 @@ set(CMAKE_CXX_FLAGS "-std=c++0x")
 find_package(Boost COMPONENTS program_options date_time  REQUIRED)
 
 include_directories(include src ${Boost_INCLUDE_DIRS})
-add_executable(punchr src/punchr.cpp src/timesheet.cpp)
-target_link_libraries(punchr ${Boost_LIBRARIES})
+add_executable(punchr src/punchr.cpp src/timesheet.cpp src/timeSheetPersistency.cpp)
+target_link_libraries(punchr ${Boost_LIBRARIES} jsoncpp)
