@@ -25,6 +25,9 @@ using namespace boost::posix_time;
 			timeSheetPersister.syncJsonOut();
 		}
 
+		// JUST FOR TEST
+		timeSheetPersister.readSessionJson();
+
 		/*Json::Value root;
 		Json::Value toJ;
 		Json::Value months;
