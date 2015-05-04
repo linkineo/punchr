@@ -14,7 +14,7 @@ namespace punchr
 		timeSheetPersistencyStates syncJsonIn();
 		timeSheetPersistencyStates syncJsonOut();
 
-		timeSheetPersistencyStates readSessionJson(boost::posix_time::ptime &pStart);
+		timeSheetPersistencyStates readSessionJson(boost::posix_time::ptime &pStart, yearReport &report);
 		timeSheetPersistencyStates writeSessionJson(boost::posix_time::ptime pnow, yearReport &report);
 		private:
 		Json::Value docRoot;

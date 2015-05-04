@@ -1,5 +1,6 @@
 #include "timeSheetPersistency.hpp"
 #include <fstream>
+#include <string>
 
 namespace punchr
 {
@@ -15,37 +16,51 @@ namespace punchr
 
     timeSheetPersistencyStates timeSheetPersistency::syncJsonIn()
 	{
+    	std::ifstream jsonIn(jsonFileName);
+    	Json::Reader readJson;
+    	if(!readJson.parse(jsonIn,docRoot,false))
+    	{
+    		return timeSheetPersistencyStates::persistencyReadNOK;
+    	}
+
 		return timeSheetPersistencyStates::persistencyReadOK;
 	}
     timeSheetPersistencyStates timeSheetPersistency::syncJsonOut()
 	{
-    	//docRoot.append(session);
-    	//Json::FastWriter fW;
     	Json::StyledWriter sW;
-    	session["years"] = sheet;
-    	docRoot["punchr"] = session;
+    	session[timeSheetId] = sheet;
+    	docRoot[punchrId] = session;
     	std::ofstream jsonOut(jsonFileName);
     	jsonOut << sW.write(docRoot);
     	std::cout << docRoot.toStyledString() << std::endl;
 		return timeSheetPersistencyStates::persistencyReadOK;
 	}
 
-	timeSheetPersistencyStates timeSheetPersistency::readSessionJson(boost::posix_time::ptime &pStart)
+	timeSheetPersistencyStates timeSheetPersistency::readSessionJson(boost::posix_time::ptime &pStart, yearReport &report)
 	{
-		std::ifstream jsonIn(jsonFileName);
-		Json::Reader readJson;
-		if(!readJson.parse(jsonIn,docRoot,false))
-		{
-			return timeSheetPersistencyStates::persistencyReadNOK;
-		}
+		pStart = boost::posix_time::time_from_string(docRoot[punchrId][lastPunchInId].asString());
 
-		pStart = boost::posix_time::time_from_string(docRoot["punchr"]["last-punch-in"].asString());
+		Json::Value years = docRoot[punchrId][timeSheetId];
+	    Json::Value::Members yrs = years.getMemberNames();
+	    std::for_each(yrs.begin(),yrs.end(),
+	    		[&](std::string &yr){
+	    	            Json::Value::Members mths = docRoot[punchrId][timeSheetId][yr].getMemberNames();
+                        std::for_each(mths.begin(),mths.end(),
+                        		[&](std::string &mths){
+                        		 Json::Value::Members dys = docRoot[punchrId][timeSheetId][yr][mths].getMemberNames();
+                        		 std::for_each(dys.begin(),dys.end(),
+                        				 [&](std::string &d){
+                        			 	 report[std::stoi(yr)][std::stoi(mths)][std::stoi(d)]= docRoot[punchrId][timeSheetId][yr][mths][d].asInt();
+                        		 });
+                        });
+	    });
+
 		return timeSheetPersistencyStates::persistencyReadOK;
 	}
 
 	timeSheetPersistencyStates timeSheetPersistency::writeSessionJson(boost::posix_time::ptime pnow, yearReport &report)
 	{
-		session["last-punch-in"]=boost::posix_time::to_simple_string(pnow);
+		session[lastPunchInId]=boost::posix_time::to_simple_string(pnow);
 
 		std::for_each(report.begin(),report.end(),
 				[&](yearReport::value_type &year){

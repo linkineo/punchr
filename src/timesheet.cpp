@@ -33,23 +33,20 @@ using namespace boost::posix_time;
 		}
 
 		// JUST FOR TEST
+		timeReport[2015][4][20]=20;
+		timeReport.clear();
+
 		boost::posix_time::ptime pStart;
-		timeSheetPersister.readSessionJson(pStart);
+		timeSheetPersister.syncJsonIn();
+		timeSheetPersister.readSessionJson(pStart,timeReport);
 		std::cout << "TIME IN: " << boost::posix_time::to_simple_string(pStart) << std::endl;
+		std::cout << "TIME REPORT:" << timeReport[2015][4][20] << std::endl;
+		std::cout << "TIME REPORT:" << timeReport[2015][4][17] << std::endl;
+		std::cout << "TIME REPORT:" << timeReport[2015][3][30] << std::endl;
+		std::cout << "TIME REPORT:" << timeReport[2014][12][10] << std::endl;
+		std::cout << "TIME REPORT:" << timeReport[2014][6][1] << std::endl;
+		std::cout << "TIME REPORT:" << timeReport[2013][1][27] << std::endl;
 
-
-
-		/*Json::Value root;
-		Json::Value toJ;
-		Json::Value months;
-		months.append("Jan");
-		months.append("Feb");
-		months.append("Mar");
-
-		toJ["Month"]=months;
-        root["Collec"] = toJ;*/
-
-        //timeReport[2015][3][2]=25;
 		return timeSheetStates::punchInOK;
 	}
 }
