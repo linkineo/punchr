@@ -25,6 +25,7 @@ namespace punchr
 
 		return timeSheetPersistencyStates::persistencyReadOK;
 	}
+
     timeSheetPersistencyStates timeSheetPersistency::syncJsonOut()
 	{
     	Json::StyledWriter sW;
@@ -36,9 +37,9 @@ namespace punchr
 		return timeSheetPersistencyStates::persistencyReadOK;
 	}
 
-	timeSheetPersistencyStates timeSheetPersistency::readSessionJson(boost::posix_time::ptime &pStart, yearReport &report)
+	timeSheetPersistencyStates timeSheetPersistency::readSessionJson(yearReport &report)
 	{
-		pStart = boost::posix_time::time_from_string(docRoot[punchrId][lastPunchInId].asString());
+
 
 		Json::Value years = docRoot[punchrId][timeSheetId];
 	    Json::Value::Members yrs = years.getMemberNames();
@@ -56,6 +57,21 @@ namespace punchr
 	    });
 
 		return timeSheetPersistencyStates::persistencyReadOK;
+	}
+
+	timeSheetSessionStates timeSheetPersistency::readSessionStart(boost::posix_time::ptime &pStart)
+	{
+		if(docRoot[punchrId][lastPunchInId].isNull())
+		{
+			pStart = boost::posix_time::not_a_date_time;
+			return timeSheetSessionStates::noSession;
+		}else
+		{
+			pStart = boost::posix_time::time_from_string(docRoot[punchrId][lastPunchInId].asString());
+			return timeSheetSessionStates::sessionStarted;
+		}
+
+
 	}
 
 	timeSheetPersistencyStates timeSheetPersistency::writeSessionJson(boost::posix_time::ptime pnow, yearReport &report)

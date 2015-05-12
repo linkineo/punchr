@@ -3,6 +3,7 @@ namespace punchr
 {
 	enum class timeSheetStates {punchInOK,punchInFail};
 	enum class timeSheetPersistencyStates {persistencyWriteOK,persistencyReadOK,persistencyWriteNOK,persistencyReadNOK};
+	enum class timeSheetSessionStates {sessionStarted,noSession};
 
 	const std::string jsonFileName = "punchr.json";
 	const std::string timeSheetId = "time";
