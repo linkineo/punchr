@@ -21,9 +21,12 @@ namespace punchr
     	if(!readJson.parse(jsonIn,docRoot,false))
     	{
     		return timeSheetPersistencyStates::persistencyReadNOK;
-    	}
-
+    	}else
+    	{
+    	session = docRoot[punchrId];
+    	sheet = session[timeSheetId];
 		return timeSheetPersistencyStates::persistencyReadOK;
+    	}
 	}
 
     timeSheetPersistencyStates timeSheetPersistency::syncJsonOut()
@@ -33,13 +36,12 @@ namespace punchr
     	docRoot[punchrId] = session;
     	std::ofstream jsonOut(jsonFileName);
     	jsonOut << sW.write(docRoot);
-    	std::cout << docRoot.toStyledString() << std::endl;
+    	//std::cout << docRoot.toStyledString() << std::endl;
 		return timeSheetPersistencyStates::persistencyReadOK;
 	}
 
 	timeSheetPersistencyStates timeSheetPersistency::readSessionJson(yearReport &report)
 	{
-
 
 		Json::Value years = docRoot[punchrId][timeSheetId];
 	    Json::Value::Members yrs = years.getMemberNames();
@@ -107,5 +109,9 @@ namespace punchr
 		return timeSheetPersistencyStates::persistencyWriteOK;
 	}
 
-
+	timeSheetPersistencyStates timeSheetPersistency::writeSessionStart(boost::posix_time::ptime &pStart)
+	{
+		session[lastPunchInId]=boost::posix_time::to_simple_string(pStart);
+		return timeSheetPersistencyStates::persistencyWriteOK;
+	}
 }

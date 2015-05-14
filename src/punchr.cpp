@@ -11,10 +11,10 @@ void handleOptions(int argc, char ** argv)
 namespace po = boost::program_options;
 po::options_description desc("Punchr options");
 desc.add_options()
-	("lines","displays all recorded entries")
-	("in","start a new job session")
-	("out","stop an ongoing job session")
-	("status","get current session status")
+	("lines,l","displays all recorded entries")
+	("in,i","start a new job session")
+	("out,o","stop an ongoing job session")
+	("status,s","get current session status")
 ;
 	 
 po::variables_map vm;
