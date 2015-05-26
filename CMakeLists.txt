@@ -5,7 +5,7 @@ project(punchr)
 set(CMAKE_EXPORT_COMPILE_COMMANDS "ON")
 
 #cpp 11
-set(CMAKE_CXX_FLAGS "-std=c++0x")
+set(CMAKE_CXX_FLAGS "-std=c++11")
 
 #boost
 find_package(Boost COMPONENTS program_options date_time  REQUIRED)

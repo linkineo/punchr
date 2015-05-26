@@ -114,4 +114,10 @@ namespace punchr
 		session[lastPunchInId]=boost::posix_time::to_simple_string(pStart);
 		return timeSheetPersistencyStates::persistencyWriteOK;
 	}
+
+	timeSheetPersistencyStates timeSheetPersistency::resetSessionStart()
+	{
+		session[lastPunchInId]=Json::nullValue;
+		return timeSheetPersistencyStates::persistencyWriteOK;
+	}
 }

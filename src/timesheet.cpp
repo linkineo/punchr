@@ -22,12 +22,13 @@ using namespace boost::posix_time;
 		timeSheetPersister.syncJsonIn();
 		if(timeSheetPersister.readSessionStart(pStart) == timeSheetSessionStates::sessionStarted)
 		{
-			std::cout << "TIME IN:" << boost::posix_time::to_simple_string(pStart) << std::endl;
+			std::cout << "/!\\ Punched in already --> " << boost::posix_time::to_simple_string(pStart) << std::endl;
+			std::cout << "Punch out first !" << std::endl;
 			return timeSheetStates::punchInFail;
-		}else
+		}else;
 		{
-			std::cout << "NO SESSION STARTED - STARTING" << std::endl;
 			ptime pnow = second_clock::local_time();
+			std::cout << "--> Punch-in @ " << boost::posix_time::to_simple_string(pnow) << std::endl;
 			timeSheetPersister.writeSessionStart(pnow);
 			timeSheetPersister.syncJsonOut();
 			return timeSheetStates::punchInOK;
@@ -38,27 +39,63 @@ using namespace boost::posix_time;
 
 	timeSheetStates timeSheet::punchOut()
 	{
+		boost::posix_time::ptime pStart;
+		boost::posix_time::ptime pNow = second_clock::local_time();
 
+				timeSheetPersister.syncJsonIn();
+		if(timeSheetPersister.readSessionStart(pStart) == timeSheetSessionStates::sessionStarted)
+		{
+			boost::posix_time::time_duration punchDuration;
+			punchDuration = pNow - pStart;
 
-		/*timeReport[2015][4][20]=15;
-		timeReport[2015][4][17]=12;
-		timeReport[2015][3][30]=9;
-		timeReport[2014][12][10]=87;
-		timeReport[2014][6][1]=23;
-		timeReport[2013][1][27]=19;*/
-		//timeSheetPersister.writeSessionJson(pnow,timeReport);
-		//timeSheetPersister.syncJsonOut();
+			if(punchDuration.hours() > maxPunchTimeHours)
+			{
+				std::cout << "Error - A session can only last for 24 contiguous hours. This session started -->"
+				<< boost::posix_time::to_simple_string(pStart) << std::endl;
 
-	timeSheetPersister.readSessionJson(timeReport);
+			}else {
+				timeSheetPersister.readSessionJson(timeReport);
 
-	std::cout << "TIME REPORT:" << timeReport[2015][4][20] << std::endl;
-	std::cout << "TIME REPORT:" << timeReport[2015][4][17] << std::endl;
-	std::cout << "TIME REPORT:" << timeReport[2015][3][30] << std::endl;
-	std::cout << "TIME REPORT:" << timeReport[2014][12][10] << std::endl;
-	std::cout << "TIME REPORT:" << timeReport[2014][6][1] << std::endl;
-	std::cout << "TIME REPORT:" << timeReport[2013][1][27] << std::endl;
+				if(pNow.date().day() == pStart.date().day())
+				{
+					timeReport[pStart.date().year()]
+					[pStart.date().month()]
+					[pStart.date().day()]
+							+= punchDuration.total_seconds()/60;
+				}
 
-		return timeSheetStates::punchInOK;
+				//untested
+				if(pNow.date().day() == pStart.date().day() + 1)
+				{
+					boost::posix_time::ptime endOfDay(date(pStart.date().year(),pStart.date().month(),pStart.date().day()+1));
+					boost::posix_time::time_duration toEndOfDay = endOfDay - pStart;
+					boost::posix_time::time_duration fromBeginOfDay = pNow - endOfDay;
+
+					timeReport[pStart.date().year()]
+					[pStart.date().month()]
+					[pStart.date().day()]
+							+= toEndOfDay.total_seconds()/60;
+
+					timeReport[pNow.date().year()]
+					[pNow.date().month()]
+					[pNow.date().day()]
+							+= fromBeginOfDay.total_seconds()/60;
+				}
+
+				std::cout << "Punched out --> Duration = " << boost::posix_time::to_simple_string(punchDuration) << std::endl;
+
+			}
+
+			    timeSheetPersister.writeSessionJson(pStart,timeReport);
+				timeSheetPersister.resetSessionStart();
+				timeSheetPersister.syncJsonOut();
+
+		} else
+		{
+			std::cout << " /!\\ Cannot punch-out. Punch-in first !" << std::endl;
+		}
+
+		return timeSheetStates::punchOutOK;
 	}
 
 }
