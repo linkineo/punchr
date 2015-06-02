@@ -10,8 +10,9 @@ namespace punchr{
 		     timeSheet();
 		     ~timeSheet();
         
-		     timeSheetStates punchIn();
-		     timeSheetStates punchOut();
+		     timeSheetStates punchIn(std::string inputTime);
+		     timeSheetStates punchOut(std::string inputTime);
+		     timeConversions validateAndConvertTime(std::string inputTime,int &hoursIn, int &minutesIn);
             
 		private:
 		     yearReport timeReport;

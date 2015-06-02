@@ -15,7 +15,27 @@ using namespace boost::posix_time;
 
     }
 
-	timeSheetStates timeSheet::punchIn()
+	timeConversions timeSheet::validateAndConvertTime(std::string inputTime,int &hoursIn, int &minutesIn)
+	{
+		int totalInp = std::stoi(inputTime);
+		if(totalInp == -1)
+		{
+			return timeConversions::inputIsInvalidTime;
+		}
+		if(!(totalInp > 0 && totalInp < 2359))
+		{
+			std::cout << "Invalid time input format." << std::endl;
+			return timeConversions::inputIsInvalidTime;
+		}else
+		{
+			hoursIn = std::stoi(inputTime.substr(0,2));
+			minutesIn = std::stoi(inputTime.substr(2,2));
+			return timeConversions::inputIsValidTime;
+		}
+
+	}
+
+	timeSheetStates timeSheet::punchIn(std::string inputTime)
 	{
 		boost::posix_time::ptime pStart;
 
@@ -28,21 +48,36 @@ using namespace boost::posix_time;
 		}else;
 		{
 			ptime pnow = second_clock::local_time();
+
+			int hoursIn = 0, minutesIn = 0;
+			if(validateAndConvertTime(inputTime,hoursIn,minutesIn) == timeConversions::inputIsValidTime)
+			{
+				ptime pConstructed(date(pnow.date().year(),pnow.date().month(),pnow.date().day()),hours(hoursIn)+minutes(minutesIn));
+				pnow = pConstructed;
+			}
+
 			std::cout << "--> Punch-in @ " << boost::posix_time::to_simple_string(pnow) << std::endl;
 			timeSheetPersister.writeSessionStart(pnow);
 			timeSheetPersister.syncJsonOut();
 			return timeSheetStates::punchInOK;
 		}
-		return timeSheetStates::punchInOK;
+
 	}
 
 
-	timeSheetStates timeSheet::punchOut()
+	timeSheetStates timeSheet::punchOut(std::string inputTime)
 	{
 		boost::posix_time::ptime pStart;
 		boost::posix_time::ptime pNow = second_clock::local_time();
 
-				timeSheetPersister.syncJsonIn();
+		int hoursIn = 0, minutesIn = 0;
+		if(validateAndConvertTime(inputTime,hoursIn,minutesIn) == timeConversions::inputIsValidTime)
+		{
+			ptime pConstructed(date(pNow.date().year(),pNow.date().month(),pNow.date().day()),hours(hoursIn)+minutes(minutesIn));
+			pNow = pConstructed;
+		}
+
+		timeSheetPersister.syncJsonIn();
 		if(timeSheetPersister.readSessionStart(pStart) == timeSheetSessionStates::sessionStarted)
 		{
 			boost::posix_time::time_duration punchDuration;
@@ -64,7 +99,6 @@ using namespace boost::posix_time;
 							+= punchDuration.total_seconds()/60;
 				}
 
-				//untested
 				if(pNow.date().day() == pStart.date().day() + 1)
 				{
 					boost::posix_time::ptime endOfDay(date(pStart.date().year(),pStart.date().month(),pStart.date().day()+1));

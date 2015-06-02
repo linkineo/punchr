@@ -8,12 +8,14 @@
 
 void handleOptions(int argc, char ** argv)
 {
+	std::string timeInput("");
+
 	namespace po = boost::program_options;
 	po::options_description desc("Punchr options");
 	desc.add_options()
 			("lines,l","displays all recorded entries")
-			("in,i","start a new job session")
-			("out,o","stop an ongoing job session")
+			("in,i",po::value<std::string>(&timeInput)->implicit_value("-1"),"start a new job session")
+			("out,o",po::value<std::string>(&timeInput)->implicit_value("-1"),"stop an ongoing job session")
 			("status,s","get current session status")
 			;
 
@@ -23,17 +25,18 @@ void handleOptions(int argc, char ** argv)
 
 	punchr::timeSheet ts;
 
+
 	if(vm.count("lines"))
 	{
 		std::cout << "lines - not yet implemented" << std::endl;
 	}
 	if(vm.count("in"))
 	{
-		ts.punchIn();
+		ts.punchIn(vm["in"].as<std::string>());
 	}
 	if(vm.count("out"))
 	{
-		ts.punchOut();
+		ts.punchOut(vm["out"].as<std::string>());
 	}
 	if(vm.count("status"))
 	{
