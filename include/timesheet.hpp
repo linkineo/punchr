@@ -13,9 +13,11 @@ namespace punchr{
 		     timeSheetStates punchIn(std::string inputTime);
 		     timeSheetStates punchOut(std::string inputTime);
 		     timeSheetStates punchStatus();
-		     timeConversions validateAndConvertTime(std::string inputTime,int &hoursIn, int &minutesIn);
+		     timeSheetStates punchList(int month);
+
             
 		private:
+		     timeConversions validateAndConvertTime(std::string inputTime,int &hoursIn, int &minutesIn);
 		     yearReport timeReport;
 		     boost::posix_time::ptime sessionBegin;
 		     timeSheetPersistency timeSheetPersister;

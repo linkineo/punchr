@@ -9,11 +9,12 @@
 void handleOptions(int argc, char ** argv)
 {
 	std::string timeInput("");
+	int month = 0;
 
 	namespace po = boost::program_options;
 	po::options_description desc("Punchr options");
 	desc.add_options()
-			("lines,l","displays all recorded entries")
+			("lines,l",po::value<int>(&month)->implicit_value(0),"displays all recorded entries")
 			("in,i",po::value<std::string>(&timeInput)->implicit_value("now"),"start a new job session")
 			("out,o",po::value<std::string>(&timeInput)->implicit_value("now"),"stop an ongoing job session")
 			("status,s","get current session status")
@@ -28,7 +29,7 @@ void handleOptions(int argc, char ** argv)
 
 	if(vm.count("lines"))
 	{
-		std::cout << "lines - not yet implemented" << std::endl;
+		ts.punchList(vm["lines"].as<int>());
 	}
 	if(vm.count("in"))
 	{

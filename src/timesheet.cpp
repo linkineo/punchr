@@ -32,6 +32,35 @@ using namespace boost::posix_time;
 			minutesIn = std::stoi(inputTime.substr(2,2));
 			return timeConversions::inputIsValidTime;
 		}
+	}
+
+	timeSheetStates timeSheet::punchList(int month)
+	{
+		boost::posix_time::ptime pNow;
+		pNow = boost::posix_time::second_clock::local_time();
+		yearReport yR;
+		timeSheetPersister.syncJsonIn();
+		timeSheetPersister.readSessionJson(yR);
+
+		if(month == 0)
+		{
+			month = pNow.date().month();
+		}
+
+		std::cout << "Month=" << month << std::endl;
+
+		minutesPerDay mpD = yR[pNow.date().year()][month];
+		std::for_each(mpD.begin(),mpD.end(),[&](minutesPerDay::value_type &mins){
+
+			double fracTime = (double) mins.second / 60;
+			boost::posix_time::time_duration td(0, mins.second, 0, 0);
+			std::cout << month <<"/" << mins.first << " --> "
+			<< boost::posix_time::to_simple_string(td)
+			<< " / " << std::setprecision(3)
+			<< fracTime << "hrs" << std::endl;
+
+		});
+
 
 	}
 
@@ -55,8 +84,8 @@ using namespace boost::posix_time;
 		if(timeToday != 0) {
 			double fracTime = (double) timeToday / 60;
 			boost::posix_time::time_duration td(0, timeToday, 0, 0);
-			std::setprecision(2);
-			std::cout << "Session today --> " << boost::posix_time::to_simple_string(td) << " - " << fracTime <<
+			std::cout << "Session today --> " << boost::posix_time::to_simple_string(td)
+			<< " / " << std::setprecision(3) << fracTime <<
 			"hrs" << std::endl;
 		}else
 		{
