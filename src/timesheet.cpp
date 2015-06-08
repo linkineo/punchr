@@ -17,11 +17,11 @@ using namespace boost::posix_time;
 
 	timeConversions timeSheet::validateAndConvertTime(std::string inputTime,int &hoursIn, int &minutesIn)
 	{
-		int totalInp = std::stoi(inputTime);
-		if(totalInp == -1)
+		if(inputTime == "now")
 		{
 			return timeConversions::inputIsInvalidTime;
 		}
+		int totalInp = std::stoi(inputTime);
 		if(!(totalInp > 0 && totalInp < 2359))
 		{
 			std::cout << "Invalid time input format." << std::endl;
@@ -33,6 +33,37 @@ using namespace boost::posix_time;
 			return timeConversions::inputIsValidTime;
 		}
 
+	}
+
+	timeSheetStates timeSheet::punchStatus()
+	{
+		boost::posix_time::ptime pStart,pNow;
+		pNow = boost::posix_time::second_clock::local_time();
+		yearReport yR;
+		timeSheetPersister.syncJsonIn();
+		timeSheetPersister.readSessionJson(yR);
+
+		if(timeSheetPersister.readSessionStart(pStart) == timeSheetSessionStates::sessionStarted)
+		{
+			std::cout << "/!\\ Punched in already --> " << boost::posix_time::to_simple_string(pStart) << std::endl;
+		}else
+		{
+			std::cout << "No punch-in yet" << std::endl;
+		}
+
+		int timeToday = yR[pNow.date().year()][pNow.date().month()][pNow.date().day()];
+		if(timeToday != 0) {
+			double fracTime = (double) timeToday / 60;
+			boost::posix_time::time_duration td(0, timeToday, 0, 0);
+			std::setprecision(2);
+			std::cout << "Session today --> " << boost::posix_time::to_simple_string(td) << " - " << fracTime <<
+			"hrs" << std::endl;
+		}else
+		{
+			std::cout << "No session today" << std::endl;
+		}
+
+		return timeSheetStates::punchStatusOK;
 	}
 
 	timeSheetStates timeSheet::punchIn(std::string inputTime)

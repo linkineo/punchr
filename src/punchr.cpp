@@ -14,8 +14,8 @@ void handleOptions(int argc, char ** argv)
 	po::options_description desc("Punchr options");
 	desc.add_options()
 			("lines,l","displays all recorded entries")
-			("in,i",po::value<std::string>(&timeInput)->implicit_value("-1"),"start a new job session")
-			("out,o",po::value<std::string>(&timeInput)->implicit_value("-1"),"stop an ongoing job session")
+			("in,i",po::value<std::string>(&timeInput)->implicit_value("now"),"start a new job session")
+			("out,o",po::value<std::string>(&timeInput)->implicit_value("now"),"stop an ongoing job session")
 			("status,s","get current session status")
 			;
 
@@ -40,7 +40,11 @@ void handleOptions(int argc, char ** argv)
 	}
 	if(vm.count("status"))
 	{
-		std::cout << "status - not yet implemented" << std::endl;
+		ts.punchStatus();
+	}
+	if(vm.count("help") || argc == 1)
+	{
+		std::cout << desc << std::endl;
 	}
 }
 

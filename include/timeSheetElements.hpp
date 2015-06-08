@@ -1,7 +1,7 @@
 #include <map>
 namespace punchr
 {
-	enum class timeSheetStates {punchInOK,punchInFail, punchOutOK, punchOutFail};
+	enum class timeSheetStates {punchInOK,punchInFail, punchOutOK, punchOutFail, punchStatusOK, punchStatusFail};
 	enum class timeSheetPersistencyStates {persistencyWriteOK,persistencyReadOK,persistencyWriteNOK,persistencyReadNOK};
 	enum class timeSheetSessionStates {sessionStarted,noSession};
 	enum class timeConversions {inputIsValidTime,inputIsInvalidTime};
