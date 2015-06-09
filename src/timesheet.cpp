@@ -1,4 +1,6 @@
 #include "timesheet.hpp"
+#include "termcolor.hpp"
+#include <iomanip>
 
 
 namespace punchr
@@ -36,6 +38,7 @@ using namespace boost::posix_time;
 
 	timeSheetStates timeSheet::punchList(int month)
 	{
+		using namespace std;
 		boost::posix_time::ptime pNow;
 		pNow = boost::posix_time::second_clock::local_time();
 		yearReport yR;
@@ -47,17 +50,40 @@ using namespace boost::posix_time;
 			month = pNow.date().month();
 		}
 
-		std::cout << "Month=" << month << std::endl;
+		boost::posix_time::ptime pMon(date(pNow.date().year(),month,pNow.date().day()));
+		cout << termcolor::green << termcolor::bold <<
+				setw(3) << "" <<
+				setw(7) << left << "Time report - " << pMon.date().month() <<
+				endl;
+		cout  <<  termcolor::red << termcolor::bold <<
+				setw(3) << left << "" <<
+				setw(7) << "Day" <<
+				setw(10) << "Hours" <<
+				setw(10) << "Decimal"<<
+		        termcolor::reset << endl;
 
 		minutesPerDay mpD = yR[pNow.date().year()][month];
-		std::for_each(mpD.begin(),mpD.end(),[&](minutesPerDay::value_type &mins){
+		int lineCount = 0;
+		for_each(mpD.begin(),mpD.end(),[&](minutesPerDay::value_type &mins){
 
+			lineCount++;
+			if(lineCount%2)
+			{
+				cout << termcolor::cyan << termcolor::bold;
+			}else
+			{
+				cout << termcolor::magenta << termcolor::bold;
+			}
 			double fracTime = (double) mins.second / 60;
 			boost::posix_time::time_duration td(0, mins.second, 0, 0);
-			std::cout << month <<"/" << mins.first << " --> "
-			<< boost::posix_time::to_simple_string(td)
-			<< " / " << std::setprecision(3)
-			<< fracTime << "hrs" << std::endl;
+			//boost::posix_time::ptime pDay(date(pNow.date().year(),pNow.date().month(),mins.first));
+			cout <<
+					setw(3) << "" <<
+					setw(7) << mins.first <<
+					setw(10) << boost::posix_time::to_simple_string(td).substr(0,5) <<
+					setw(10) << setprecision(3) << fracTime <<
+					termcolor::reset <<
+					endl;
 
 		});
 
